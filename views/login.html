@@ -1,0 +1,21 @@
+{{define "title"}}
+Login Page
+{{end}}
+
+{{define "body"}}
+<div class="grid">
+  <a href="/">
+    <h1 style="color:green">World Explorer</h1>
+  </a>
+</div>
+<form action="/loginHandler" method="post">
+  <label for="email">Email Address:</label><br>
+  <input type="text" id="email" name="email"><br>
+  <label for="password">Password:</label><br>
+  <input type="password" id="password" name="password">
+  <input type="submit" value="Login">
+</form>
+<a href="/signup">
+  <button>Need to register?</button>
+</a>
+{{end}}

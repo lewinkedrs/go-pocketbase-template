@@ -1,0 +1,16 @@
+{{define "title"}}
+Home Page
+{{end}}
+
+{{define "body"}}
+<div>
+  <div>
+    <form hx-post="/save_location" hx-target="#data">
+      <label for="location">Location:</label>
+      <input type="text" id="location" name="location" />
+      <input type="submit" value="Save Location" />
+    </form>
+    <h1 id="data">THIS WILL BE DATA</h1>
+  </div>
+</div>
+{{end}}

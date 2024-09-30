@@ -1,0 +1,13 @@
+{{define "nav"}}
+<div class="grid">
+  <a href="/">
+    <h1 style="color:green">World Explorer</h1>
+  </a>
+  {{if .isLoggedIn}}
+  <button hx-get="/my_places" hx-target="#data">My Places</button>
+  <button hx-post="/logout" hx-target="#body">Logout</button>
+  {{else}}
+  <button hx-get="/login" hx-target="#body">Login</button>
+  {{end}}
+</div>
+{{end}}

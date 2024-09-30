@@ -1,0 +1,18 @@
+{{define "title"}}
+Login Page
+{{end}}
+
+{{define "body"}}
+<div class="grid">
+  <a href="/">
+    <h1 style="color:green">World Explorer</h1>
+  </a>
+</div>
+<form hx-post="/register" hx-target="#body">
+  <label for="email">Email Address:</label><br>
+  <input type="text" id="email" name="email"><br>
+  <label for="password">Password:</label><br>
+  <input type="password" id="password" name="password">
+  <input type="submit" value="Register">
+</form>
+{{end}}

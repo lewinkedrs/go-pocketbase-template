@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark" />
+  <link rel="stylesheet" href="css/pico.min.css">
+  <script src="https://unpkg.com/htmx.org@2.0.0"></script>
+  <script src="/surreal.js"></script>
+  <title>{{block "title" . }} Default app title{{end}}</title>
+</head>
+
+<body>
+  <main class="container" id="body">
+    {{block "nav" .}} {{end}}
+    {{block "body" .}} Default app body... {{end}}
+  </main>
+</body>
+
+</html>

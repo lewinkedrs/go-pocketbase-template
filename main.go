@@ -116,8 +116,9 @@ func main() {
 			if err != nil {
 				return c.String(http.StatusOK, "Please log in to save a location")
 			}
+			data := fmt.Sprintf(`{"user_id":"%s"}`, id_cookie)
 			url := fmt.Sprintf(`http://127.0.0.1:8090/api/collections/favorite_locations/records?filter=(user_id='%s')`, id_cookie)
-			req, err := http.NewRequest("GET", url, strings.NewReader(""))
+			req, err := http.NewRequest("GET", url, strings.NewReader(data))
 			if err != nil {
 				return c.String(http.StatusInternalServerError, err.Error())
 			}

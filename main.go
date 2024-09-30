@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"os"
 	"strings"
-	"time"
 
 	"github.com/labstack/echo/v5"
 	"github.com/pocketbase/pocketbase"
@@ -28,23 +27,7 @@ func main() {
 		// (it acts as store for the parsed templates)
 		registry := template.NewRegistry()
 
-		e.Router.GET("/hello/:name", func(c echo.Context) error {
-			name := c.PathParam("name")
-
-			html, err := registry.LoadFiles(
-				"views/layout.html",
-				"views/hello.html",
-			).Render(map[string]any{
-				"name": name,
-			})
-			if err != nil {
-				// or redirect to a dedicated 404 HTML page
-				return apis.NewNotFoundError("", err)
-			}
-
-			return c.HTML(http.StatusOK, html)
-		})
-
+		//Serve up index
 		e.Router.GET("/", func(c echo.Context) error {
 			var isLoggedIn bool
 			isLoggedIn = false
@@ -65,6 +48,7 @@ func main() {
 			return c.HTML(http.StatusOK, html)
 		})
 
+		//login page
 		e.Router.GET("/login", func(c echo.Context) error {
 			html, err := registry.LoadFiles(
 				"views/layout.html",
@@ -78,20 +62,7 @@ func main() {
 			return c.HTML(http.StatusOK, html)
 		})
 
-		e.Router.POST("/logout", func(c echo.Context) error {
-			token_cookie := new(http.Cookie)
-			token_cookie.Name = "explore_token"
-			token_cookie.Value = ""
-			token_cookie.Expires = time.Now()
-			c.SetCookie(token_cookie)
-			id_cookie := new(http.Cookie)
-			id_cookie.Name = "id"
-			id_cookie.Value = ""
-			id_cookie.Expires = time.Now()
-			c.SetCookie(id_cookie)
-			return c.Redirect(http.StatusMovedPermanently, "/")
-		})
-
+		//signup page
 		e.Router.GET("/signup", func(c echo.Context) error {
 			html, err := registry.LoadFiles(
 				"views/layout.html",
@@ -105,6 +76,7 @@ func main() {
 			return c.HTML(http.StatusOK, html)
 		})
 
+		//get user's places hypermedia response
 		e.Router.GET("/my_places", func(c echo.Context) error {
 			id, err := c.Cookie("id")
 			if err != nil {
@@ -155,38 +127,12 @@ func main() {
 			return c.HTML(http.StatusOK, html)
 		})
 
-		e.Router.POST("/register", func(c echo.Context) error {
-			email := c.FormValue("email")
-			password := c.FormValue("password")
+		//auth handlers
+		e.Router.POST("/logout", logoutHandler)
+		e.Router.POST("/register", registerHandler)
+		e.Router.POST("/loginHandler", loginHandler)
 
-			data := fmt.Sprintf(`{"email":"%s","password":"%s","passwordConfirm":"%s"}`, email, password, password)
-
-			req, err := http.NewRequest("POST", "http://127.0.0.1:8090/api/collections/users/records", strings.NewReader(data))
-			if err != nil {
-				return c.String(http.StatusInternalServerError, err.Error())
-			}
-
-			req.Header.Set("Content-Type", "application/json")
-
-			client := &http.Client{}
-			resp, err := client.Do(req)
-			if err != nil {
-				return c.String(http.StatusInternalServerError, err.Error())
-			}
-			defer resp.Body.Close()
-
-			body, err := io.ReadAll(resp.Body)
-			if err != nil {
-				return c.String(http.StatusInternalServerError, err.Error())
-			}
-
-			if resp.StatusCode == http.StatusOK {
-				return c.Redirect(http.StatusMovedPermanently, "/")
-			}
-
-			return c.String(http.StatusBadRequest, string(body))
-		})
-
+		//create record
 		e.Router.POST("save_location", func(c echo.Context) error {
 			location := c.FormValue("location")
 
@@ -227,68 +173,6 @@ func main() {
 
 			return c.String(http.StatusBadRequest, string(body))
 		})
-
-		e.Router.POST("/loginHandler", func(c echo.Context) error {
-			email := c.FormValue("email")
-			password := c.FormValue("password")
-
-			data := fmt.Sprintf(`{"identity":"%s","password":"%s","passwordConfirm":"%s"}`, email, password, password)
-
-			req, err := http.NewRequest("POST", "http://127.0.0.1:8090/api/collections/users/auth-with-password", strings.NewReader(data))
-			if err != nil {
-				return c.String(http.StatusInternalServerError, err.Error())
-			}
-
-			req.Header.Set("Content-Type", "application/json")
-
-			client := &http.Client{}
-			resp, err := client.Do(req)
-			if err != nil {
-				return c.String(http.StatusInternalServerError, err.Error())
-			}
-			defer resp.Body.Close()
-
-			body, err := io.ReadAll(resp.Body)
-			if err != nil {
-				return c.String(http.StatusInternalServerError, err.Error())
-			}
-
-			if resp.StatusCode == http.StatusOK {
-				var authResponse struct {
-					Token  string `json:"token"`
-					Record struct {
-						ID              string `json:"id"`
-						CollectionID    string `json:"collectionId"`
-						CollectionName  string `json:"collectionName"`
-						Created         string `json:"created"`
-						Updated         string `json:"updated"`
-						Username        string `json:"username"`
-						Email           string `json:"email"`
-						Verified        bool   `json:"verified"`
-						EmailVisibility bool   `json:"emailVisibility"`
-						SomeCustomField string `json:"someCustomField"`
-					} `json:"record"`
-				}
-				err = json.Unmarshal(body, &authResponse)
-				if err != nil {
-					return c.String(http.StatusInternalServerError, err.Error())
-				}
-				token_cookie := new(http.Cookie)
-				token_cookie.Name = "explore_token"
-				token_cookie.Value = authResponse.Token
-				token_cookie.Expires = time.Now().Add(24 * time.Hour)
-				c.SetCookie(token_cookie)
-				id_cookie := new(http.Cookie)
-				id_cookie.Name = "id"
-				id_cookie.Value = authResponse.Record.ID
-				id_cookie.Expires = time.Now().Add(24 * time.Hour)
-				c.SetCookie(id_cookie)
-				return c.Redirect(http.StatusMovedPermanently, "/")
-			}
-
-			return c.String(http.StatusBadRequest, string(body))
-		})
-
 		return nil
 	})
 

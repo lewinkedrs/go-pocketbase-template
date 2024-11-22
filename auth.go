@@ -57,12 +57,16 @@ func loginHandler(c echo.Context) error {
 		token_cookie := new(http.Cookie)
 		token_cookie.Name = "explore_token"
 		token_cookie.Value = authResponse.Token
-		token_cookie.Expires = time.Now().Add(24 * time.Hour)
+		token_cookie.Secure = true
+		token_cookie.HttpOnly = true
+		token_cookie.Expires = time.Now().Add(1 * time.Hour)
 		c.SetCookie(token_cookie)
 		id_cookie := new(http.Cookie)
 		id_cookie.Name = "id"
 		id_cookie.Value = authResponse.Record.ID
-		id_cookie.Expires = time.Now().Add(24 * time.Hour)
+		id_cookie.Secure = true
+		id_cookie.HttpOnly = true
+		id_cookie.Expires = time.Now().Add(1 * time.Hour)
 		c.SetCookie(id_cookie)
 		return c.Redirect(http.StatusMovedPermanently, "/")
 	}

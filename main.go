@@ -28,51 +28,17 @@ func main() {
 
 		//Serve up index
 		e.Router.GET("/", func(e *core.RequestEvent) error {
-			var isLoggedIn bool
-			isLoggedIn = false
-			cookie, _ := e.Request.Cookie("explore_token")
-			if cookie != nil {
-				isLoggedIn = true
-			}
-			html, err := registry.LoadFiles(
-				"views/layout.html",
-				"views/nav.html",
-				"views/index.html",
-			).Render(map[string]any{
-				"isLoggedIn": isLoggedIn,
-			})
-			if err != nil {
-				return apis.NewNotFoundError("", err)
-			}
-			return e.HTML(http.StatusOK, html)
+			return serveIndex(e, registry)
 		})
 
 		//login page
 		e.Router.GET("/login", func(e *core.RequestEvent) error {
-			html, err := registry.LoadFiles(
-				"views/layout.html",
-				"views/login.html",
-			).Render(map[string]any{
-				"hello": "hello",
-			})
-			if err != nil {
-				return apis.NewNotFoundError("", err)
-			}
-			return e.HTML(http.StatusOK, html)
+			return serveLogin(e, registry)
 		})
 
 		//signup page
 		e.Router.GET("/signup", func(e *core.RequestEvent) error {
-			html, err := registry.LoadFiles(
-				"views/layout.html",
-				"views/register.html",
-			).Render(map[string]any{
-				"hello": "hello",
-			})
-			if err != nil {
-				return apis.NewNotFoundError("", err)
-			}
-			return e.HTML(http.StatusOK, html)
+			return serveRegister(e, registry)
 		})
 
 		//get user's places hypermedia response
@@ -133,34 +99,7 @@ func main() {
 
 		//crud routes
 		e.Router.POST("/save_location", func(e *core.RequestEvent) error {
-			//validate auth token before anything
-			err := validateToken(e, app)
-			if err != nil {
-				return e.String(http.StatusOK, "Looks like you do not have a valid token, please login to save a location.")
-			}
-
-			//get location and id from request.
-			location := e.Request.FormValue("location")
-			id_cookie, err := e.Request.Cookie("id")
-			id := id_cookie.Value
-
-			//specfiy collection
-			collection, err := app.FindCollectionByNameOrId("favorite_locations")
-			if err != nil {
-				return err
-			}
-
-			//create record programtically instead of with http request
-			record := core.NewRecord(collection)
-			record.Set("location", location)
-			record.Set("user_id", id)
-			err = app.Save(record)
-			if err != nil {
-				return err
-			}
-
-			//return data. TODO return everything in collection with places view.
-			return e.String(http.StatusOK, fmt.Sprintf("Successfully saved location: %s", location))
+			return saveLocation(e, app)
 		})
 
 		return e.Next()

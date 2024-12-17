@@ -71,9 +71,17 @@ func servePlaces(e *core.RequestEvent, registry *template.Registry, app *pocketb
 	id_cookie := id.Value
 
 	//Find all places for user.
-	records, err := app.FindAllRecords(dbx.NewExp("LOWER(user_id) = {:user_id}", dbx.Params{"user_id": id_cookie}))
+	records, err := app.FindAllRecords("favorite_locations", dbx.NewExp("LOWER(`user_id`) = LOWER({:user_id})", dbx.Params{"user_id": id_cookie}))
 	if err != nil {
 		return err
+	}
+
+	var locationList []string
+	for _, record := range records {
+		locationName := record.GetString("location")
+		if locationName != "" {
+			locationList = append(locationList, locationName)
+		}
 	}
 
 	//render template
@@ -81,7 +89,7 @@ func servePlaces(e *core.RequestEvent, registry *template.Registry, app *pocketb
 		"views/layout.html",
 		"views/places.html",
 	).Render(map[string]any{
-		"places": records,
+		"places": locationList,
 	})
 	if err != nil {
 		return apis.NewNotFoundError("", err)

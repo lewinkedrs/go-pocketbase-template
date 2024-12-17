@@ -69,9 +69,10 @@ func loginHandler(e *core.RequestEvent) error {
 		id_cookie.HttpOnly = true
 		id_cookie.Expires = time.Now().Add(1 * time.Hour)
 		e.SetCookie(id_cookie)
-		return e.Redirect(http.StatusMovedPermanently, "/")
+		e.Response.Header().Set("HX-Redirect", "/")
 	}
-	return e.String(http.StatusBadRequest, string(body))
+	loginError := "Login Failed, Please try again"
+	return e.HTML(200, loginError)
 }
 
 func logoutHandler(e *core.RequestEvent) error {

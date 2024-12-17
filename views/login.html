@@ -1,21 +1,20 @@
-{{define "title"}}
-Login Page
-{{end}}
-
-{{define "body"}}
+{{define "title"}} Login Page {{end}} {{define "body"}}
 <div class="grid">
-  <a href="/">
-    <h1 style="color:green">World Explorer</h1>
-  </a>
+    <a href="/">
+        <h1 style="color: green">World Explorer</h1>
+    </a>
 </div>
-<form action="/loginHandler" method="post">
-  <label for="email">Email Address:</label><br>
-  <input type="text" id="email" name="email"><br>
-  <label for="password">Password:</label><br>
-  <input type="password" id="password" name="password">
-  <input type="submit" value="Login">
+<form hx-post="/loginHandler" hx-target="#errorMessage" hx-trigger="submit">
+    <label for="email">Email Address:</label><br />
+    <input type="text" id="email" name="email" /><br />
+    <label for="password">Password:</label><br />
+    <input type="password" id="password" name="password" /><br />
+    <input type="submit" value="Login" />
 </form>
+
+<!-- This is where any error message will be shown -->
+<div id="errorMessage" style="color: red"></div>
 <a href="/signup">
-  <button>Need to register?</button>
+    <button>Need to register?</button>
 </a>
 {{end}}

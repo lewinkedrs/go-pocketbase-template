@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/pocketbase/pocketbase"
@@ -36,5 +35,5 @@ func saveLocation(e *core.RequestEvent, app *pocketbase.PocketBase) error {
 	}
 
 	//return data. TODO return everything in collection with places view.
-	return e.String(http.StatusOK, fmt.Sprintf("Successfully saved location: %s", location))
+	return e.Redirect(303, "/my_places")
 }

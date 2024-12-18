@@ -9,6 +9,7 @@ import (
 )
 
 func loginHandler(e *core.RequestEvent, app *pocketbase.PocketBase) error {
+	//get credentials from request
 	email := e.Request.FormValue("email")
 	password := e.Request.FormValue("password")
 
@@ -17,6 +18,7 @@ func loginHandler(e *core.RequestEvent, app *pocketbase.PocketBase) error {
 		return e.HTML(200, "User does not exist")
 	}
 
+	//Check if credentials are correct and return token
 	isAuthenticated := user.ValidatePassword(password)
 	if isAuthenticated {
 		token, err := user.NewAuthToken()
@@ -47,6 +49,7 @@ func loginHandler(e *core.RequestEvent, app *pocketbase.PocketBase) error {
 }
 
 func logoutHandler(e *core.RequestEvent) error {
+	//clear cookies to logout
 	token_cookie := new(http.Cookie)
 	token_cookie.Name = "explore_token"
 	token_cookie.Value = ""
@@ -62,6 +65,7 @@ func logoutHandler(e *core.RequestEvent) error {
 }
 
 func registerHandler(e *core.RequestEvent, app *pocketbase.PocketBase) error {
+	//extract registration data from request
 	email := e.Request.FormValue("email")
 	password := e.Request.FormValue("password")
 
@@ -70,8 +74,8 @@ func registerHandler(e *core.RequestEvent, app *pocketbase.PocketBase) error {
 		return err
 	}
 
+	//create auth record in users collection
 	record := core.NewRecord(collection)
-
 	record.SetEmail(email)
 	record.SetPassword(password)
 
@@ -84,6 +88,7 @@ func registerHandler(e *core.RequestEvent, app *pocketbase.PocketBase) error {
 }
 
 func validateToken(e *core.RequestEvent, app *pocketbase.PocketBase) error {
+	//get token from request and validate it.
 	token_cookie, err := e.Request.Cookie("explore_token")
 	if err != nil {
 		return err

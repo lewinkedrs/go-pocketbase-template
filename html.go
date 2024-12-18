@@ -11,8 +11,11 @@ import (
 )
 
 func serveIndex(e *core.RequestEvent, registry *template.Registry) error {
+	//set default status to not logged in.
 	var isLoggedIn bool
 	isLoggedIn = false
+
+	//if logged in render template with logged in assertion.
 	cookie, _ := e.Request.Cookie("explore_token")
 	if cookie != nil {
 		isLoggedIn = true

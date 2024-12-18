@@ -22,26 +22,21 @@ func main() {
 		registry := template.NewRegistry()
 
 		//hypermedia handlers
-		//Serve up index
 		e.Router.GET("/", func(e *core.RequestEvent) error {
 			return serveIndex(e, registry)
 		})
-		//login page
 		e.Router.GET("/login", func(e *core.RequestEvent) error {
 			return serveLogin(e, registry)
 		})
-		//signup page
 		e.Router.GET("/signup", func(e *core.RequestEvent) error {
 			return serveRegister(e, registry)
 		})
-		//places hypermedia response
 		e.Router.GET("/my_places", func(e *core.RequestEvent) error {
 			return servePlaces(e, registry, app)
 		})
 
 		//auth handlers
 		e.Router.POST("/logout", logoutHandler)
-		//e.Router.POST("/register", registerHandler)
 		e.Router.POST("/register", func(e *core.RequestEvent) error {
 			return registerHandler(e, app)
 		})

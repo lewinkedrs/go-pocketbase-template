@@ -48,6 +48,9 @@ func main() {
 		e.Router.POST("/save_location", func(e *core.RequestEvent) error {
 			return saveLocation(e, app)
 		})
+		e.Router.DELETE("/delete_location", func(e *core.RequestEvent) error {
+			return deleteLocation(e, app)
+		})
 
 		return e.Next()
 	})

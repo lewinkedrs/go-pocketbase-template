@@ -1,3 +1,13 @@
 {{define "body"}} {{range .places}}
-<p>Location: {{.}}</p>
+<div class="grid" style="margin: 1rem">
+    <h5>{{.}}</h5>
+    <button
+        style="width: 1srem"
+        hx-delete="/delete_location"
+        hx-target="#data"
+        hx-vals='{"location": "{{.}}"}'
+    >
+        Delete
+    </button>
+</div>
 {{end}} {{end}}

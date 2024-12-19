@@ -1,9 +1,13 @@
-{{define "title"}} Login Page {{end}} {{define "body"}}
+{{define "title"}} Login Page {{end}}
+
+{{define "body"}}
 <div class="grid">
     <a href="/">
         <h1 style="color: green">World Explorer</h1>
     </a>
 </div>
+
+<!-- Login Form -->
 <form hx-post="/loginHandler" hx-target="#errorMessage" hx-trigger="submit">
     <label for="email">Email Address:</label><br />
     <input type="text" id="email" name="email" /><br />
@@ -12,9 +16,48 @@
     <input type="submit" value="Login" />
 </form>
 
-<!-- This is where any error message will be shown -->
+<!-- Forgot Password Button -->
+<button id="forgotPasswordButton" style="width: 100%; margin-bottom: 1rem;">Forgot Password?</button>
+
+<!-- Error or Success Message Display -->
 <div id="errorMessage" style="color: red"></div>
+<div id="successMessage" style="color: green"></div>
+
 <a href="/signup">
     <button style="width: 100%">Need to register?</button>
 </a>
+
+<!-- PocketBase JS SDK Integration -->
+<script>
+    const pb = new PocketBase('http://localhost:8090'); // Your local PocketBase URL
+    const forgotPasswordButton = document.getElementById('forgotPasswordButton');
+    const emailInput = document.getElementById('email');
+    const errorMessage = document.getElementById('errorMessage');
+    const successMessage = document.getElementById('successMessage');
+
+    forgotPasswordButton.addEventListener('click', async function() {
+        const email = emailInput.value.trim();
+
+        // Reset previous messages
+        errorMessage.textContent = '';
+        successMessage.textContent = '';
+
+        if (!email) {
+            errorMessage.textContent = 'Please enter your email address.';
+            return;
+        }
+
+        try {
+            // Send password reset request using PocketBase's JS SDK
+            await pb.collection('users').requestPasswordReset(email);
+
+            // Display success message
+            successMessage.textContent = 'Password reset instructions have been sent to your email.';
+        } catch (error) {
+            // Display error message
+            errorMessage.textContent = 'Failed to send password reset instructions. Please try again.';
+        }
+    });
+</script>
+
 {{end}}

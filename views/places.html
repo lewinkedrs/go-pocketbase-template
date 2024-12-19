@@ -1,13 +1,22 @@
-{{define "body"}} {{range .places}}
-<div class="grid" style="margin: 1rem">
-    <h5>{{.}}</h5>
-    <button
-        style="width: 50%"
-        hx-delete="/delete_location"
-        hx-target="#data"
-        hx-vals='{"location": "{{.}}"}'
-    >
-        Delete
-    </button>
-</div>
-{{end}} {{end}}
+{{define "body"}}
+    {{if .places}}
+        {{range .places}}
+        <div class="grid" style="margin: 1rem">
+            <h5>{{.}}</h5>
+            <button
+                style="width: 50%"
+                hx-delete="/delete_location"
+                hx-target="#data"
+                hx-vals='{"location": "{{.}}"}'
+            >
+                Delete
+            </button>
+        </div>
+        {{end}}
+    {{else}}
+        <!-- If the list is empty, display this message -->
+        <div id="emptyMessage" style="color: red; margin-top: 2rem;">
+            Looks like you don't have any places saved yet, try to save a location!
+        </div>
+    {{end}}
+{{end}}
